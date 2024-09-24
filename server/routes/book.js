@@ -1,26 +1,11 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const router = express.Router();
 const Book = require("../models/Book")
-const { body, validationResult } = require("express-validator")
-
-// Middleware for validating book input 
-const bookValidationRules = [
-  body('title').isString().trim().notEmpty().withMessage('Title is required'),
-  body('author').isString().trim().notEmpty().withMessage('Author is required'),
-  body('genre').isArray().withMessage('Genre must be an array').bail()
-    .custom((arr) => arr.every(genre => typeof genre === 'string' && genre.trim() !== ''))
-    .withMessage('Each genre must be a non-empty string'),
-  // body('coverImage').isURL().withMessage('Valid cover image URL is required')
-];
-
-// Utility to check validation results.
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-};
+const sharp = require("sharp");
+const upload = require("../middleware/multer");
+const { bookValidationRules, validate } = require("../middleware/bookValidation")
 
 router.get("/", async (req, res) => {
   try {
@@ -32,9 +17,30 @@ router.get("/", async (req, res) => {
   }
 })
 
-router.post("/", bookValidationRules, validate, async (req, res) => {
+router.post("/", upload.single('coverImage'), bookValidationRules, validate, async (req, res) => {
   try {
+    console.log("file", req?.file);
     const book = new Book(req.body);
+
+    const originalFilePath = path.normalize(req.file.path); // Normalize the path
+    const webpFilePath = `uploads/compressed_${Date.now()}.webp`;
+
+    // Convert image to WebP format and compress it
+    await sharp(originalFilePath)
+      .resize(800, 800, {
+        fit: sharp.fit.inside,
+        withoutEnlargement: true,
+      })
+      .toFormat('webp', { quality: 80 }) // Convert to WebP and compress
+      .toFile(webpFilePath);
+
+    // book.coverImage = `/uploads/${req.file.filename}`;
+    book.coverImage = webpFilePath;
+    console.log("book", book);
+
+    // Delete the original uploaded file to save space (optional)
+    fs.unlinkSync(originalFilePath);
+
     const savedBook = await book.save();
     res.status(200).json(savedBook);
   } catch (error) {
@@ -42,12 +48,17 @@ router.post("/", bookValidationRules, validate, async (req, res) => {
   }
 })
 
-router.put("/:id", validate, async (req, res) => {
+router.put("/:id", upload.single('coverImage'), validate, async (req, res) => {
   const id = req?.params?.id;
   console.log("in put", id);
 
   try {
-    const updatedBook = await Book.findOneAndUpdate({ _id: id }, req?.body, {
+    const updatedData = { ...req.body };
+    if (req.file) {
+      updatedData.coverImage = `/uploads/${req.file.filename}`; // Update the cover image if provided
+    }
+
+    const updatedBook = await Book.findOneAndUpdate({ _id: id }, updatedData, {
       new: true,
       runValidators: true,
     })
