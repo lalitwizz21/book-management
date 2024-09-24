@@ -1,13 +1,17 @@
-const { body, validationResult } = require("express-validator")
+const { body, validationResult } = require("express-validator");
 
-// Middleware for validating book input 
+// Middleware for validating book input
 const bookValidationRules = [
-  body('title').isString().trim().notEmpty().withMessage('Title is required'),
-  body('author').isString().trim().notEmpty().withMessage('Author is required'),
-  body('genre').isArray().withMessage('Genre must be an array').bail()
-    .custom((arr) => arr.every(genre => typeof genre === 'string' && genre.trim() !== ''))
-    .withMessage('Each genre must be a non-empty string'),
-  // body('coverImage').isURL().withMessage('Valid cover image URL is required')
+  body("title").isString().trim().notEmpty().withMessage("Title is required"),
+  body("author").isString().trim().notEmpty().withMessage("Author is required"),
+  body("genre")
+    .isArray()
+    .withMessage("Genre must be an array")
+    .bail()
+    .custom((arr) =>
+      arr.every((genre) => typeof genre === "string" && genre.trim() !== "")
+    )
+    .withMessage("Each genre must be a non-empty string"),
 ];
 
 // Utility to check validation results.
