@@ -5,13 +5,19 @@ const sharp = require("sharp");
 //  Process the uploaded image and return the URL of the processed image.
 const processImage = async (file) => {
   // Generate a unique filename for the processed image.
-  const outputFileName = `${Date.now()}_${
-    file.originalname.split(".")[0]
-  }.webp`;
-  const outputPath = path.join(__dirname, "../uploads", outputFileName);
+  const outputFileName = `${Date.now()}_${file.originalname.split(".")[0]}.webp`;
 
-  // Create the directory if it does not exist.
-  const dir = path.join(__dirname, "../uploads");
+  // Use /tmp for serverless environments
+  const dir = process.env.NODE_ENV === 'production' ?
+    path.join('/tmp', 'uploads')
+    : path.join(__dirname, '../uploads');
+  // For local development
+
+  const outputPath = path.join(dir, outputFileName);
+
+  // // Create the directory if it does not exist.
+  // const dir = path.join(__dirname, "../uploads");
+
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }

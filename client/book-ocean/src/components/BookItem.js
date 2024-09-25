@@ -59,7 +59,7 @@ const BookItem = ({ book, onDelete, onUpdate }) => {
       <p className="text-sm font-semibold mb-1 text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">
         {book.author}
       </p>
-      <p className="text-sm text-gray-600 mb-1">{book.genre.join(", ")}</p>
+      <p className="text-sm text-gray-600 mb-1">{book?.genre?.join(", ")}</p>
       {book.description && (
         <p className="text-sm text-gray-500">{book.description}</p>
       )}

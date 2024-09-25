@@ -15,7 +15,7 @@ const BookList = ({ setCurrentBook }) => {
     dispatch(fetchBooks());
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="p-4 text-center font-bold text-xl">Loading...</p>;
 
   return (
     <div className="container mx-auto p-4">
