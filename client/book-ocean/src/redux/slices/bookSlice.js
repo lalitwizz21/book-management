@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
 import {
   fetchBooks,
   addBook,
@@ -39,12 +38,10 @@ const bookSlice = createSlice({
         console.log("fulfilled add", JSON.stringify(state, null, 2));
         state.books.push(action.payload);
         state.totalBooks += 1;
-        toast.success("Book added successfully.");
       })
       .addCase(addBook.rejected, (state, action) => {
         console.log("fulfilled update", JSON.stringify(state, null, 2));
         state.error = action.error.message;
-        toast.error("Failed to add the Book.");
       })
       .addCase(updateBook.fulfilled, (state, action) => {
         console.log("fulfilled update", JSON.stringify(state, null, 2));
@@ -54,23 +51,19 @@ const bookSlice = createSlice({
         if (index !== -1) {
           state.books[index] = action.payload;
         }
-        toast.success("Book updated successfully.");
       })
       .addCase(updateBook.rejected, (state, action) => {
         console.log("fulfilled update", JSON.stringify(state, null, 2));
         state.error = action.error.message;
-        toast.error("Failed to update the Book.");
       })
       .addCase(deleteBook.fulfilled, (state, action) => {
         console.log("fulfilled delete", JSON.stringify(state, null, 2));
         state.books = state.books.filter((book) => book._id !== action.payload);
         state.totalBooks = Math.max(0, state.totalBooks - 1);
-        toast.success("Book deleted successfully.");
       })
       .addCase(deleteBook.rejected, (state, action) => {
         console.log("fulfilled update", JSON.stringify(state, null, 2));
         state.error = action.error.message;
-        toast.error("Failed to deleted the Book.");
       });
   },
 });

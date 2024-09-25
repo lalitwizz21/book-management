@@ -15,7 +15,12 @@ const deleteFile = (filePath) => {
 };
 
 const getFilePath = (filename) => {
-  return path.join(__dirname, "../uploads", filename);
+  console.log("process.env", process.env);
+
+  // Check if in a production environment 
+  return process.env.NODE_ENV === 'production'
+    ? path.join('/tmp', 'uploads', filename)
+    : path.join(__dirname, '../uploads', filename);
 };
 
 module.exports = { deleteFile, getFilePath };
