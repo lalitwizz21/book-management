@@ -35,7 +35,7 @@ npm install
 ```
 3. Create a `.env` file and add your API URL:
 ```
-REACT_APP_API_URL=http://localhost:4000/api
+REACT_APP_API_URL=http://localhost:4000
 ```
 4. Start the client:
 ```
